@@ -24,6 +24,7 @@ export default function Index() {
 <Link href="/main/welcome">welcome</Link>
 <Link href="/main/home">home</Link>
 <Link href="/petSignup/PetData">pet</Link>
+<Link href="/profilePages/about">about</Link>
 
 
     </View>

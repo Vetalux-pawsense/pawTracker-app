@@ -38,14 +38,20 @@ const ProfileScreen = () => {
       icon: <Ionicons name="help-circle-outline" size={24} color="#F7C948" />,
       route: '/profilePages/about' as const,
     },
-    {
+     {
       id: '4',
+      label: 'Raise a concern',
+      icon: <Ionicons name="help-circle-outline" size={24} color="#F7C948" />,
+      route: '/profilePages/complaints' as const,
+    },
+    {
+      id: '5',
       label: 'Settings',
       icon: <Feather name="settings" size={24} color="#A0D995" />,
       route: '/profilePages/settings' as const,
     },
     {
-      id: '5',
+      id: '6',
       label: 'Logout',
       icon: <Feather name="log-out" size={24} color="#FF6B6B" />,
       action: 'logout',

@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState,useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator,StyleSheet, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -12,33 +12,80 @@ export default function Login() {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [apiError, setApiError] = useState('');
+    const [isCheckingAuth, setIsCheckingAuth] = useState(true);  // <- NEW State
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const token = await SecureStore.getItemAsync('authToken');
+                console.log('Logged Token: ', token);
+
+                if (token) {
+                    const profileRes = await fetch('https://canine-dog.vercel.app/api/auth/profile', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                    });
+
+                    const profileData = await profileRes.json();
+
+                    if (profileRes.ok) {
+                        if (profileData.userProfile.isAnimal === true) {
+                            router.replace({
+                                pathname: '/main/home',
+                                params: {
+                                    userProfile: JSON.stringify(profileData.userProfile),
+                                },
+                            });
+                        } else {
+                            router.replace('/petSignup/PetData');
+                        }
+                        return;  // Don't continue, already redirected
+                    } else {
+                        console.log('Invalid token, staying on login.');
+                    }
+                } else {
+                    console.log('No token, staying on login.');
+                }
+            } catch (error) {
+                console.log('Error verifying token:', error);
+            } finally {
+                setIsCheckingAuth(false);  // <- Done checking
+            }
+        };
+
+        checkAuth();
+    }, []);
 
     const togglePasswordVisibility = () => {
         setIsPasswordVisible(!isPasswordVisible);
     };
+
 
     const handleLogin = async () => {
         if (!email || !password) {
             setApiError('Please fill in all fields');
             return;
         }
-    
+
         setIsLoading(true);
         setApiError('');
-    
+
         try {
             const response = await fetch('https://canine-dog.vercel.app/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
             });
-    
+
             const data = await response.json();
-    
+
             if (!response.ok) {
                 throw new Error(data.message || 'Login failed');
             }
-    
+
             await storeToken(data.accessToken);
             await SecureStore.setItemAsync('authToken', data.accessToken);
 
@@ -49,24 +96,21 @@ export default function Login() {
                     'Authorization': `Bearer ${data.accessToken}`,
                 },
             });
-    
+
             const animalData = await animalRes.json();
-    
+
             if (!animalRes.ok) {
                 throw new Error(animalData.message || 'Animal status check failed');
             }
-    
-            if (animalData.userProfile.isAnimal==true) {
-              
+
+            if (animalData.userProfile.isAnimal === true) {
                 router.replace({
                     pathname: '/main/home',
                     params: {
-                      userProfile: JSON.stringify(animalData.userProfile), 
+                        userProfile: JSON.stringify(animalData.userProfile),
                     },
-                  });
-                  
+                });
             } else {
-             
                 router.replace('/petSignup/PetData');
             }
         } catch (error: any) {
@@ -75,6 +119,16 @@ export default function Login() {
             setIsLoading(false);
         }
     };
+
+    // 👇 If still checking token, show a simple loader
+    if (isCheckingAuth) {
+        return (
+            <SafeAreaView style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#4D55CC" />
+            </SafeAreaView>
+        );
+    }
+
     
 
 
@@ -172,6 +226,12 @@ export default function Login() {
     )
 };
 const styles = StyleSheet.create({
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+    },
     container: {
         flex: 1,
         padding: 20,

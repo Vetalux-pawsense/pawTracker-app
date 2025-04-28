@@ -11,7 +11,8 @@ import {
 } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-
+import { router } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 
 const ProfileScreen = () => {
   const router = useRouter();
@@ -19,6 +20,14 @@ const ProfileScreen = () => {
   const parsedProfile = typeof userProfile === 'string' ? JSON.parse(userProfile) : null;
   console.log(userProfile);
 
+  const handleLogout = async () => {
+    try {
+      await SecureStore.deleteItemAsync('authToken');
+      router.replace('/(auth)'); // Replace with your login page route
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
   const options = [
     {
       id: '1',
@@ -65,6 +74,7 @@ const ProfileScreen = () => {
       onPress={() => {
         if (item.action === 'logout') {
           console.log('Logging out...');
+          handleLogout();
    
         } else if (item.route) {
           router.push({

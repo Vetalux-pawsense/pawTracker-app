@@ -38,6 +38,8 @@ export default function Signup() {
   const [step, setStep] = useState(1);
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [apiError, setApiError] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false)
 
   const handleSendOtp = async (email: string) => {
     setIsSendingOtp(true);
@@ -184,7 +186,7 @@ export default function Signup() {
               name="paw"
               size={80}
               color="rgba(33,28,132,0.1)"
-              style={[styles.topPaw, { transform: [{ rotate: '-240deg' }] }]}
+              style={[styles.topPaw, { transform: [{ rotate: '150deg' }] }]}
             />
             <MaterialCommunityIcons
               name="paw"
@@ -297,28 +299,52 @@ export default function Signup() {
                       <Text style={styles.inputHeading}>Password</Text>
                       {touched.password && errors.password && <Text style={styles.error}>{errors.password}</Text>}
 
-                      <TextInput
-                        placeholder="Password"
-                        placeholderTextColor="gray"
-                        style={styles.input}
-                        secureTextEntry
-                        onChangeText={handleChange('password')}
-                        onBlur={handleBlur('password')}
-                        value={values.password}
-                      />
+                      <View style={styles.passwordContainer}>
+  <TextInput
+    placeholder="Password"
+    placeholderTextColor="gray"
+    style={[styles.input, { paddingRight: 40 }]}
+    secureTextEntry={!passwordVisible}
+    onChangeText={handleChange('password')}
+    onBlur={handleBlur('password')}
+    value={values.password}
+  />
+  <TouchableOpacity
+    style={styles.eyeButton}
+    onPress={() => setPasswordVisible(!passwordVisible)}
+  >
+    <MaterialCommunityIcons
+      name={passwordVisible ? 'eye-off' : 'eye'}
+      size={24}
+      color="#666"
+    />
+  </TouchableOpacity>
+</View>
 
                       <Text style={styles.inputHeading}>Confirm Password</Text>
                       {touched.confirmPassword && errors.confirmPassword && <Text style={styles.error}>{errors.confirmPassword}</Text>}
 
-                      <TextInput
-                        placeholder="Confirm Password"
-                        placeholderTextColor="gray"
-                        style={styles.input}
-                        secureTextEntry
-                        onChangeText={handleChange('confirmPassword')}
-                        onBlur={handleBlur('confirmPassword')}
-                        value={values.confirmPassword}
-                      />
+                      <View style={styles.passwordContainer}>
+  <TextInput
+    placeholder="Confirm Password"
+    placeholderTextColor="gray"
+    style={[styles.input, { paddingRight: 40 }]}
+    secureTextEntry={!confirmPasswordVisible}
+    onChangeText={handleChange('confirmPassword')}
+    onBlur={handleBlur('confirmPassword')}
+    value={values.confirmPassword}
+  />
+  <TouchableOpacity
+    style={styles.eyeButton}
+    onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+  >
+    <MaterialCommunityIcons
+      name={confirmPasswordVisible ? 'eye-off' : 'eye'}
+      size={24}
+      color="#666"
+    />
+  </TouchableOpacity>
+</View>
 
                       <TouchableOpacity
                         onPress={async () => {
@@ -405,6 +431,16 @@ export default function Signup() {
 }
 
 const styles = StyleSheet.create({
+  passwordContainer: {
+    position: 'relative',
+    marginBottom: 25,
+  },
+  eyeButton: {
+    position: 'absolute',
+    right: 15,
+    top: 10,
+    padding: 5,
+  },
   container: 
   { 
     flex: 1, 
@@ -457,6 +493,7 @@ const styles = StyleSheet.create({
   },
   subtitle: 
   { 
+    fontFamily: 'Poppins-Regular', 
     fontSize: 16, 
     color: '#666', 
     textAlign: 'center', 
@@ -468,10 +505,13 @@ const styles = StyleSheet.create({
     marginBottom: 20 
   },
   inputHeading: 
-  { 
+  {   
+    fontFamily: 'Poppins-Regular', 
+
     paddingBottom: 5 
   },
   input: {
+    fontFamily: 'Poppins-Regular', 
     height: 50, borderWidth: 1, 
     borderColor: '#ddd', 
     borderRadius: 8,
@@ -490,6 +530,7 @@ const styles = StyleSheet.create({
   },
   buttonText: 
   { 
+    
     fontFamily:'Poppins-Regular',
     color: '#fff',
     fontSize: 16, 
@@ -497,6 +538,8 @@ const styles = StyleSheet.create({
   },
   error: 
   { 
+    fontFamily: 'Poppins-Regular', 
+
     color: 'red', 
     fontSize: 10
   },
@@ -539,6 +582,8 @@ const styles = StyleSheet.create({
   },
   avatarText: 
   { 
+    fontFamily: 'Poppins-Regular', 
+
     color: '#666', 
     fontSize: 16 
   },

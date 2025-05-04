@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet, Image, SafeAreaView, Modal, FlatList } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { KeyboardAvoidingView, Platform } from 'react-native';
@@ -172,23 +171,7 @@ const Complaints: React.FC = () => {
             {errors.complaintType && <Text style={styles.error}>{errors.complaintType}</Text>}
           </View>
 
-          <View style={[styles.inputContainer, { flex: 1 }]}>
-            <Text style={styles.label}>Incident Date</Text>
-            <TouchableOpacity style={styles.input} onPress={() => setShowDatePicker(true)}>
-              <Text>{formData.date.toLocaleDateString()}</Text>
-              <Feather name="calendar" size={20} color="#666" />
-            </TouchableOpacity>
-            {showDatePicker && (
-              <DateTimePicker
-                value={formData.date}
-                mode="date"
-                onChange={(event, date) => {
-                  setShowDatePicker(false);
-                  if (date) setFormData({ ...formData, date });
-                }}
-              />
-            )}
-          </View>
+          
         </View>
 
         {/* Dropdown Modal */}

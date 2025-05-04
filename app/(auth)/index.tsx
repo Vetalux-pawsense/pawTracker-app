@@ -1,11 +1,11 @@
 
-import React, { useState,useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator,StyleSheet, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Linking, TouchableOpacity, ActivityIndicator, StyleSheet, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 
-import { storeToken } from '../utils/auth';
+
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -13,6 +13,7 @@ export default function Login() {
     const [isLoading, setIsLoading] = useState(false);
     const [apiError, setApiError] = useState('');
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);  // <- NEW State
+    const GOOGLE_AUTH_URL = 'https://canine-dog.vercel.app/api/auth/google';
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -86,7 +87,6 @@ export default function Login() {
                 throw new Error(data.message || 'Login failed');
             }
 
-            await storeToken(data.accessToken);
             await SecureStore.setItemAsync('authToken', data.accessToken);
 
             const animalRes = await fetch('https://canine-dog.vercel.app/api/auth/profile', {
@@ -129,100 +129,105 @@ export default function Login() {
         );
     }
 
-    
+
 
 
     return (
         <SafeAreaView style={styles.container}>
-        <MaterialCommunityIcons
-            name="paw"
-            size={80}
-            color="rgba(33,28,132,0.1)"
-            style={[styles.topPaw, { transform: [{ rotate: '-240deg' }] }]}
-        />
-        <MaterialCommunityIcons
-            name="paw"
-            size={80}
-            color="rgba(33,28,132,0.1)"
-            style={[styles.centerPaw, { transform: [{ rotate: '-50deg' }] }]}
-        />
-        <MaterialCommunityIcons
-            name="paw"
-            size={80}
-            color="rgba(0,0,0,0.1)"
-            style={[styles.bottomPaw, { transform: [{ rotate: '40deg' }] }]}
-        />
-      
-        <KeyboardAvoidingView
-            style={styles.keyboardAvoid}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
-            <View style={styles.subContainer}>
-                <Text style={styles.title}>Log In</Text>
-                <Text style={styles.subtitle}>AI-powered tracking to ensure your dog stays happy, healthy, and safe</Text>
+            <MaterialCommunityIcons
+                name="paw"
+                size={80}
+                color="rgba(33,28,132,0.1)"
+                style={[styles.topPaw, { transform: [{ rotate: '-240deg' }] }]}
+            />
+            <MaterialCommunityIcons
+                name="paw"
+                size={80}
+                color="rgba(33,28,132,0.1)"
+                style={[styles.centerPaw, { transform: [{ rotate: '-50deg' }] }]}
+            />
+            <MaterialCommunityIcons
+                name="paw"
+                size={80}
+                color="rgba(0,0,0,0.1)"
+                style={[styles.bottomPaw, { transform: [{ rotate: '40deg' }] }]}
+            />
 
-                <View style={styles.inputContainer}>
-                    {apiError ? <Text style={styles.errorText}>{apiError}</Text> : null}
+            <KeyboardAvoidingView
+                style={styles.keyboardAvoid}
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+            >
+                <View style={styles.subContainer}>
+                    <Text style={styles.title}>Log In</Text>
+                    <Text style={styles.subtitle}>AI-powered tracking to ensure your dog stays happy, healthy, and safe</Text>
 
-                    <Text style={styles.inputHeading}>Email</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Enter your email"
-                        placeholderTextColor="#666"
-                        value={email}
-                        onChangeText={setEmail}
-                        autoCapitalize="none"
-                        keyboardType="email-address"
-                    />
+                    <View style={styles.inputContainer}>
+                        {apiError ? <Text style={styles.errorText}>{apiError}</Text> : null}
 
-                    <Text style={styles.inputHeading}>Password</Text>
-                    <View style={styles.passwordInputContainer}>
+                        <Text style={styles.inputHeading}>Email</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder="Password"
+                            placeholder="Enter your email"
                             placeholderTextColor="#666"
-                            secureTextEntry={!isPasswordVisible}
-                            value={password}
-                            onChangeText={setPassword}
+                            value={email}
+                            onChangeText={setEmail}
+                            autoCapitalize="none"
+                            keyboardType="email-address"
                         />
-                        <TouchableOpacity
-                            style={styles.toggleButton}
-                            onPress={togglePasswordVisibility}
-                        >
-                            <Ionicons
-                                name={isPasswordVisible ? "eye-off" : "eye"}
-                                size={20}
-                                color="#666"
+
+                        <Text style={styles.inputHeading}>Password</Text>
+                        <View style={styles.passwordInputContainer}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Password"
+                                placeholderTextColor="#666"
+                                secureTextEntry={!isPasswordVisible}
+                                value={password}
+                                onChangeText={setPassword}
                             />
+                            <TouchableOpacity
+                                style={styles.toggleButton}
+                                onPress={togglePasswordVisibility}
+                            >
+                                <Ionicons
+                                    name={isPasswordVisible ? "eye-off" : "eye"}
+                                    size={20}
+                                    color="#666"
+                                />
+                            </TouchableOpacity>
+                        </View>
+                        <TouchableOpacity onPress={() => router.push('/main/forgetpass')}>
+                            <Text style={styles.googleButtonText}>Forget Password</Text>
                         </TouchableOpacity>
                     </View>
-                    <Text style={styles.passwordHint}>must be 8 characters</Text>
-                </View>
 
-                <TouchableOpacity style={styles.googleButton}>
-                    <Ionicons name="logo-google" size={20} color="black" />
-                    <Text style={styles.googleButtonText}>Google</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity 
-                    style={[styles.loginButton, isLoading && styles.disabledButton]} 
-                    onPress={handleLogin}
-                    disabled={isLoading}
-                >
-                    <Text style={styles.loginButtonText}>
-                        {isLoading ? 'Logging in...' : 'Login'}
-                    </Text>
-                </TouchableOpacity>
-
-                <View style={styles.signupContainer}>
-                    <Text style={styles.signupText}>Don't have an account?</Text>
-                    <TouchableOpacity onPress={() => router.push('/(auth)/signup')}>
-                        <Text style={styles.signupLink}>Create one</Text>
+                    <TouchableOpacity
+                        onPress={() => Linking.openURL(GOOGLE_AUTH_URL)}
+                        style={styles.googleButton}
+                    >
+                        <Ionicons name="logo-google" size={20} color="black" />
+                        <Text style={styles.googleButtonText}>Google</Text>
                     </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.loginButton, isLoading && styles.disabledButton]}
+                        onPress={handleLogin}
+                        disabled={isLoading}
+                    >
+                        <Text style={styles.loginButtonText}>
+                            {isLoading ? 'Logging in...' : 'Login'}
+                        </Text>
+                    </TouchableOpacity>
+
+                    <View style={styles.signupContainer}>
+                        <Text style={styles.signupText}>Don't have an account?</Text>
+                        <TouchableOpacity onPress={() => router.push('/(auth)/signup')}>
+                            <Text style={styles.signupLink}>Create one</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-            </View>
-        </KeyboardAvoidingView>
-    </SafeAreaView>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     )
 };
 const styles = StyleSheet.create({
@@ -283,7 +288,7 @@ const styles = StyleSheet.create({
     },
 
     passwordInputContainer: {
-        zIndex:1,
+        zIndex: 1,
         position: 'relative',
     },
     toggleButton: {

@@ -6,38 +6,74 @@ const screenWidth = Dimensions.get('window').width;
 const CHART_HEIGHT = 250;
 const CHART_WIDTH = screenWidth * 1.5;
 
-const moodLabels = [ 'Aggression','Sad','Fear','Curious','Relax','Happy'  ];
-
 type MoodGraphProps = {
-    petName: string;
-    selectedDate: string;
-    selectedMood: string;
-    dataPoints: number[];
-    weekLabels: string[];
+    emotionData: Array<{
+        date: string;
+        emotionBreakdown: Record<string, number>;
+        weekday?: string;  // Make optional
+      }>;    latestMood: string;
+    dateRange: string;
+};
+const emotionMap: Record<string, string> = {
+    'Aggression': 'Aggression',
+    'Curiosity / Alertness': 'Curious',
+    'Excitement / Happiness': 'Happy',
+    'Fear / Submission': 'Fear',
+    'Jealousy / Possessiveness': 'Jealousy',
+    'Relaxation / Contentment': 'Relax',
+    'Sadness / Depression': 'Sad',
+    'Stress / Anxiety': 'Stress'
+  };
+const moodLabels = [
+    'Aggression',
+    'Stress',
+    'Jealousy',
+    'Fear', 
+    'Sad',
+    'Curious',
+    'Relax',
+    'Happy' // Positive emotions at the top
+  ];// Check for empty data first
+  const MoodGraph: React.FC<MoodGraphProps> = ({ emotionData, latestMood, dateRange }) => {
+    
+if (!emotionData || emotionData.length === 0) {
+    return <Text>No mood data available.</Text>;
+}
+
+console.log(emotionData);
+// Process data
+const weekLabels = emotionData.map((entry) => 
+    entry.weekday 
+  );
+ 
+
+  // Process data points with emotion mapping
+  const dataPoints = emotionData.map((entry) => {
+    const emotions = Object.entries(entry.emotionBreakdown);
+    if (emotions.length === 0) return 0;
+    
+    const dominantEmotion = emotions.reduce((a, b) => (a[1] > b[1] ? a : b))[0];
+    const simplifiedEmotion = emotionMap[dominantEmotion] || 'Unknown';
+    
+    return moodLabels.indexOf(simplifiedEmotion);
+  });
+
+  const maxMood = moodLabels.length - 1;
+  const minMood = 0;
+  const pointSpacing = 70;
+  const yLabelSpacing = CHART_HEIGHT / (moodLabels.length - 1);
+const getY = (value: number) => {
+    const range = maxMood - minMood;
+    const percent = (value - minMood) / range;
+    return CHART_HEIGHT - percent * CHART_HEIGHT;
 };
 
-const MoodGraph: React.FC<MoodGraphProps> = ({
-    petName,
-    selectedDate,
-    selectedMood,
-    dataPoints,
-    weekLabels,
-}) => {
-    const maxMood = 8;
-    const minMood = 1;
-    const pointSpacing = 70;
-    const yLabelSpacing = CHART_HEIGHT / (moodLabels.length - 1);
-
-    const getY = (value: number) => {
-        const range = maxMood - minMood;
-        const percent = (value - minMood) / range;
-        return CHART_HEIGHT - percent * CHART_HEIGHT;
-    };
-
-    const points = dataPoints.map((y, i) => ({
-        x: i * pointSpacing + 50,
-        y: getY(y),
-    }));
+// Generate points array
+const points = dataPoints.map((value, index) => ({
+    x: index * pointSpacing + 50,
+    y: getY(value),
+}));
+   
 
     const generateSmoothPath = (pts: { x: number; y: number }[]) => {
         if (pts.length < 2) return '';
@@ -72,7 +108,7 @@ const MoodGraph: React.FC<MoodGraphProps> = ({
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View style={{ flexDirection: 'row', paddingVertical: 10 }}>
-                    <View style={{ width: 80, height: CHART_HEIGHT, position: 'relative' }}>
+                    <View style={{   width: 80, height: CHART_HEIGHT, position: 'relative' }}>
                         {[...moodLabels].reverse().map((label, index) => {
                             const y = index * yLabelSpacing - 6; 
                             return (
@@ -160,12 +196,12 @@ const MoodGraph: React.FC<MoodGraphProps> = ({
             <View style={styles.summaryRow}>
                 <View style={styles.summaryBlockLeft}>
                     <Text style={styles.summaryLabel}>Today</Text>
-                    <Text style={styles.summaryValue}>{selectedDate}</Text>
+                    <Text style={styles.summaryValue}>{dateRange}</Text>
                 </View>
                 <View style={styles.summaryBlockRight}>
                     <Text style={styles.summaryLabel}>Mood</Text>
-                    <Text style={styles.summaryValue}>{selectedMood}</Text>
-                </View>
+                    <Text style={styles.summaryValue}>{emotionMap[latestMood] || "unavaulabe"}</Text>
+                    </View>
             </View>
 
 

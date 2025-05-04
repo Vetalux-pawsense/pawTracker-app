@@ -8,7 +8,7 @@ import {
 interface BodyTemperatureProps {
   day: string;
   date: string;
-  temperature: number;
+  temperature: any;
   range: string;
 }
 

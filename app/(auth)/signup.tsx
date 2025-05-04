@@ -90,12 +90,10 @@ export default function Signup() {
 
   const handleRegister = async (values: any) => {
     try {
-      console.log('--- Starting registration ---');
-      console.log('Form values:', values);
+    
   
       const [firstName, ...lastNameParts] = values.fullName.split(' ');
       const lastName = lastNameParts.join(' ') || '';
-      console.log('Name split:', { firstName, lastName });
   
       const formData = new FormData();
       formData.append('firstName', firstName);
@@ -106,14 +104,12 @@ export default function Signup() {
       formData.append('password', values.password);
       formData.append('otp', values.otp);
   
-      console.log('FormData (before file):');
       // @ts-ignore - temporary debugging
       for (const [key, value] of formData._parts) {
         console.log(`  ${key}:`, value);
       }
   
       if (values.profileImgUrl) {
-        console.log('Processing image:', values.profileImgUrl);
         const filename = values.profileImgUrl.split('/').pop();
         const match = /\.(\w+)$/.exec(filename || '');
         const type = match ? `image/${match[1] === 'jpg' ? 'jpeg' : match[1]}` : 'image/jpeg';

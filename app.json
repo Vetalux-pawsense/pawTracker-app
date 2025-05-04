@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "my-app",
+    "name": "PawSense",
     "slug": "my-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,7 +9,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.prasad19.myapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -45,7 +49,6 @@
         }
       ],
       "expo-font",
-      "expo-barcode-scanner",
       "expo-secure-store"
     ],
     "experiments": {
@@ -58,6 +61,7 @@
       "eas": {
         "projectId": "22794e11-5d53-4a2a-9ed2-e2d478b34da1"
       }
-    }
+    },
+    "owner": "prasad19"
   }
 }

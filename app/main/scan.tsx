@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert, StyleSheet, Dimensions, Animated } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import { Camera, CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+
 
 interface DeviceInfo {
   deviceId: string;
@@ -20,7 +21,7 @@ const Scan = () => {
   const [isPaired, setIsPaired] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successAnim] = useState(new Animated.Value(0));
-
+  const [scanned, setScanned] = useState(false);
   useEffect(() => {
     getAuthToken();
   }, []);
@@ -40,27 +41,58 @@ const Scan = () => {
   };
 
   useEffect(() => {
-    (async () => {
-      if (!hasPermission?.granted) {
-        await requestPermission();
+    const verifyPermissions = async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permission Required',
+          'We need camera access to scan QR codes',
+          [{ text: 'OK', onPress: () => router.back() }]
+        );
       }
-    })();
+    };
+    verifyPermissions();
   }, []);
+
 
   const handleBarCodeScanned = ({ data }: { data: string }) => {
     try {
-      const deviceInfo: DeviceInfo = JSON.parse(data);
-      if (deviceInfo.deviceId && deviceInfo.deviceName && deviceInfo.deviceType) {
-        setScannedDevice(deviceInfo);
-        setIsScanning(false);
-        setErrorMessage(null);
-      } else {
-        throw new Error('Invalid device data');
-      }
-    } catch (error) {
-      setErrorMessage('Invalid device QR code');
+      setScanned(true);  // Prevent multiple scans
+      const deviceInfo = validateQRData(data);  // Add validation function
+      setScannedDevice(deviceInfo);
       setIsScanning(false);
+    } catch (error) {
+      handleScanError(error);
     }
+  };
+  const validateQRData = (data: string): DeviceInfo => {
+    try {
+      const parsed = JSON.parse(data);
+      if (!parsed.deviceId || !parsed.deviceName || !parsed.deviceType) {
+        throw new Error('Invalid device data structure');
+      }
+      return parsed;
+    } catch (error) {
+      throw new Error('Invalid QR code format');
+    }
+  };
+
+  // Enhanced error handling
+  const handleScanError = (error: unknown) => {
+    let message = 'QR scan failed';
+    if (error instanceof Error) message = error.message;
+    
+    setErrorMessage(message);
+    setTimeout(() => {
+      setErrorMessage(null);
+      setScanned(false);
+    }, 2000);
+  };
+  const restartScan = () => {
+    setScanned(false);
+    setScannedDevice(null);
+    setIsScanning(true);
+    setErrorMessage(null);
   };
 
   const startSuccessAnimation = () => {
@@ -128,13 +160,19 @@ const Scan = () => {
 
   return (
     <View style={styles.container}>
-      {isScanning ? (
-        <CameraView
-          style={styles.camera}
-          facing="back"
-          barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
-          onBarcodeScanned={scannedDevice ? undefined : handleBarCodeScanned}
-        >
+    {isScanning ? (
+      <CameraView
+        style={styles.camera}
+        facing="back"
+        barcodeScannerSettings={{
+          barcodeTypes: ['qr', 'pdf417'],
+        }}
+        onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+      >
+        <View style={styles.frameOverlay}>
+      <View style={styles.frame} />
+      <Text style={styles.scanGuideText}>Align QR code within frame</Text>
+    </View>
           <View style={styles.overlay}>
             <Ionicons name="scan" size={80} color="white" />
             <Text style={styles.scanText}>Align QR Code within frame</Text>
@@ -253,6 +291,26 @@ cancelButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: '500',
+},
+frameOverlay: {
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: 'rgba(0,0,0,0.5)',
+},
+frame: {
+  width: 250,
+  height: 250,
+  borderWidth: 2,
+  borderColor: 'white',
+  borderRadius: 10,
+  backgroundColor: 'transparent',
+},
+scanGuideText: {
+  color: 'white',
+  marginTop: 20,
+  fontSize: 16,
+  fontWeight: '500',
 },
 });
 

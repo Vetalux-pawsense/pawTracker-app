@@ -75,7 +75,7 @@ const PetCard: React.FC<PetCardProps> = ({ pet }) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#B5A8D5',
+        backgroundColor: '#FFC7AB',
         borderRadius: 20,
         padding: 20,
         alignItems: 'center',

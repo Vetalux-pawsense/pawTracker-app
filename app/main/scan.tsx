@@ -81,7 +81,7 @@ const Scan = () => {
   const handleScanError = (error: unknown) => {
     let message = 'QR scan failed';
     if (error instanceof Error) message = error.message;
-    
+
     setErrorMessage(message);
     setTimeout(() => {
       setErrorMessage(null);
@@ -160,26 +160,23 @@ const Scan = () => {
 
   return (
     <View style={styles.container}>
-    {isScanning ? (
-      <CameraView
-        style={styles.camera}
-        facing="back"
-        barcodeScannerSettings={{
-          barcodeTypes: ['qr', 'pdf417'],
-        }}
-        onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-      >
-        <View style={styles.frameOverlay}>
-      <View style={styles.frame} />
-      <Text style={styles.scanGuideText}>Align QR code within frame</Text>
-    </View>
-          <View style={styles.overlay}>
-            <Ionicons name="scan" size={80} color="white" />
-            <Text style={styles.scanText}>Align QR Code within frame</Text>
+      {isScanning ? (
+        <CameraView
+          style={styles.camera}
+          facing="back"
+          barcodeScannerSettings={{
+            barcodeTypes: ['qr', 'pdf417'],
+          }}
+          onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+        >
+          <View style={styles.frameOverlay}>
+            <View style={styles.frame} />
+            <Text style={styles.scanGuideText}>Align QR code within frame</Text>
             <TouchableOpacity style={styles.cancelButton} onPress={() => setIsScanning(false)}>
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
           </View>
+
         </CameraView>
       ) : (
         <View style={styles.content}>
@@ -199,7 +196,7 @@ const Scan = () => {
             </View>
           ) : (
             <View style={styles.contentBottom}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.deviceButton, isPaired && styles.pairedButton]}
                 disabled={isPaired || isPairing}
                 onPress={handlePairDevice} // <-- 🛠️ Call handlePairDevice onPress here
@@ -231,7 +228,7 @@ const Scan = () => {
                 </Animated.View>
               )}
 
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.nextButton, !isPaired && styles.disabledButton]}
                 onPress={() => router.push('/main/welcome')}
                 disabled={!isPaired}
@@ -278,40 +275,40 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 20,
     fontWeight: '500',
-},
-cancelButton: {
+  },
+  cancelButton: {
     position: 'absolute',
     top: 50,
     right: 20,
     padding: 12,
     borderRadius: 20,
     backgroundColor: 'rgba(255,255,255,0.2)',
-},
-cancelButtonText: {
+  },
+  cancelButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: '500',
-},
-frameOverlay: {
-  flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: 'rgba(0,0,0,0.5)',
-},
-frame: {
-  width: 250,
-  height: 250,
-  borderWidth: 2,
-  borderColor: 'white',
-  borderRadius: 10,
-  backgroundColor: 'transparent',
-},
-scanGuideText: {
-  color: 'white',
-  marginTop: 20,
-  fontSize: 16,
-  fontWeight: '500',
-},
+  },
+  frameOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  frame: {
+    width: 250,
+    height: 250,
+    borderWidth: 2,
+    borderColor: 'white',
+    borderRadius: 10,
+    backgroundColor: 'transparent',
+  },
+  scanGuideText: {
+    color: 'white',
+    marginTop: 20,
+    fontSize: 16,
+    fontWeight: '500',
+  },
 });
 
 export default Scan;

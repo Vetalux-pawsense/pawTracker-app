@@ -628,11 +628,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         gap: 20,
-        marginTop: 10,
     },
     petTypeButton: {
         width: 150,
-        padding: 20,
+        padding: 10,
         borderRadius: 15,
         backgroundColor: '#F0F0F0',
         alignItems: 'center',

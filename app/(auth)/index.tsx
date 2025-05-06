@@ -34,13 +34,29 @@ export default function Login() {
 
                     if (profileRes.ok) {
                         if (profileData.userProfile.isAnimal === true) {
-                            router.replace({
-                                pathname: '/main/home',
-                                params: {
-                                    userProfile: JSON.stringify(profileData.userProfile),
-                                },
-                            });
-                        } else {
+
+                            if (profileData.userProfile.isDevice === true) {
+                                router.replace({
+                                    pathname: '/main/home',
+                                    params: {
+                                        userProfile: JSON.stringify(profileData.userProfile),
+                                    },
+                                });
+                            }
+                            else
+                            {
+                                router.replace({
+                                    pathname: '/main/scan',
+                                    params: {
+                                        userProfile: JSON.stringify(profileData.userProfile),
+                                    },
+                                });
+                            }
+
+
+                        }
+
+                        else {
                             router.replace('/petSignup/PetData');
                         }
                         return;  // Don't continue, already redirected
@@ -369,6 +385,8 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     errorText: {
+        fontFamily: 'Poppins-Regular',
+
         color: 'red',
         fontSize: 14,
         marginBottom: 10,

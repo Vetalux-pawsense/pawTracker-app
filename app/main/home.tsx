@@ -61,7 +61,7 @@ const Home = () => {
 
       const data1 = await response1.json();
       const data2 = await response2.json();
-
+      console.log("data1",data1);
       const weeklyData = data2.stats;
       const weeklyMoodData = data2.stats.map((entry: any) => ({
         date: entry.date,

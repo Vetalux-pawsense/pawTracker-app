@@ -35,12 +35,12 @@ const ProfileScreen = () => {
       icon: <Ionicons name="person-circle-outline" size={24} color="#6B6AED" />,
       route: '/profilePages/userprofile' as const,
     },
-    {
-      id: '2',
-      label: "Edit Dog's Information",
-      icon: <Feather name="edit" size={24} color="#6BCB77" />,
-      route: '/profilePages/editdog' as const,
-    },
+    // {
+    //   id: '2',
+    //   label: "Edit Dog's Information",
+    //   icon: <Feather name="edit" size={24} color="#6BCB77" />,
+    //   route: '/profilePages/editdog' as const,
+    // },
     {
       id: '3',
       label: 'About Us',
@@ -53,12 +53,12 @@ const ProfileScreen = () => {
       icon: <Ionicons name="help-circle-outline" size={24} color="#F7C948" />,
       route: '/profilePages/complaints' as const,
     },
-    {
-      id: '5',
-      label: 'Settings',
-      icon: <Feather name="settings" size={24} color="#A0D995" />,
-      route: '/profilePages/settings' as const,
-    },
+    // {
+    //   id: '5',
+    //   label: 'Settings',
+    //   icon: <Feather name="settings" size={24} color="#A0D995" />,
+    //   route: '/profilePages/settings' as const,
+    // },
     {
       id: '6',
       label: 'Logout',

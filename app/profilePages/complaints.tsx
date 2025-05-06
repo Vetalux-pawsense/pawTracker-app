@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { KeyboardAvoidingView, Platform } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 
 interface Complaint {
   name: string;
@@ -76,10 +77,41 @@ const Complaints: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      console.log('Form submitted:', formData);
-      // Submit logic here
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+  
+    try {
+      const token = await SecureStore.getItemAsync('authToken');
+      console.log(token);
+      const response = await fetch('https://canine-dog.vercel.app/api/complaint', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Token passed securely in headers
+        },
+        body: JSON.stringify({
+          title: formData.complaintType + ' incident',
+          type: formData.complaintType,
+          description: formData.description,
+          incidentDate: formData.date.toISOString(),
+          status: 'open',
+        }),
+      });
+      
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        alert('Complaint submitted successfully!');
+        console.log(token);
+        // Reset form or navigate if needed
+      } else {
+        alert('Failed to submit complaint: ' + data.message || 'Unknown error');
+      }
+  
+    } catch (error) {
+      console.error('Submit Error:', error);
+      alert('An error occurred while submitting the complaint.');
     }
   };
 
